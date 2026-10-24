@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10111b">
+<title>Libromancer & Bestias Gladiador — Checklist</title>
+<link rel="manifest" href="./manifest.json">
+<style>
+:root{color-scheme:dark;--bg:#10111b;--panel:#191b29;--panel2:#202337;--text:#f5f5fb;--muted:#a8abc1;--line:#34374d;--gold:#f0b84b;--mint:#7fe0c3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;background:radial-gradient(ellipse at 80% -10%,#303154 0,transparent 38%),var(--bg)}
+header{max-width:1000px;margin:auto;padding:24px 16px 14px}.eyebrow{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:clamp(27px,6vw,42px);line-height:1.05;margin:8px 0;font-weight:900;letter-spacing:-.04em}h1 span{color:var(--gold)}
+.subtitle{color:var(--muted);max-width:700px;font-size:13px}.wrap{max-width:1000px;margin:auto;padding:0 14px 36px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{font-size:22px;display:block}.stat small{color:var(--muted);font-size:11px}
+.toolbar{position:sticky;top:0;z-index:4;background:#10111bf2;backdrop-filter:blur(12px);padding:10px 0;border-bottom:1px solid var(--line)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.tab,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:10px 12px;font-weight:700;font-size:12px}.tab.active,.btn.primary{background:var(--gold);color:#241a08;border-color:var(--gold)}
+.searchrow{display:flex;gap:8px}.searchrow input{flex:1;min-width:0}.control{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:11px 12px;outline:none;width:100%}.control:focus{border-color:var(--gold)}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.listhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:17px 2px 10px;color:var(--muted);font-size:12px}
+.cards{display:grid;gap:8px}.card{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:13px}.card.owned{border-color:#477c70;background:linear-gradient(100deg,#18302e,var(--panel) 58%)}
+.check{width:24px;height:24px;accent-color:var(--mint);margin:0;cursor:pointer}.name{font-weight:750;font-size:14px;overflow-wrap:anywhere}.sub{font-size:11px;color:var(--muted);margin-top:3px}.tag{font-size:10px;border-radius:6px;padding:4px 6px;background:#2c2f45;color:#d8d9eb;white-space:nowrap}.owned .tag{background:#24594e;color:#b4f7e4}
+.empty{padding:32px 14px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.notice{font-size:11px;color:var(--muted);padding:16px 2px;line-height:1.6}.notice a{color:var(--gold)}.footer{color:#71758e;text-align:center;font-size:10px;padding:18px}
+@media(min-width:650px){.filters{grid-template-columns:repeat(3,1fr)}.cards{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}.card{min-height:70px}}@media(max-width:380px){.stat{padding:9px}.stat b{font-size:19px}}
+</style>
+</head>
+<body><div class="app">
+<header><div class="eyebrow">TCG · Checklist personal</div><h1>Libromancer <span>&amp; Bestias Gladiador</span></h1><div class="subtitle">Checklist de los dos arquetipos. Marca tus cartas; el progreso se guarda en este navegador. La lista conserva el orden y las entradas repetidas que pediste.</div></header>
+<main class="wrap">
+<section class="stats"><div class="stat"><b id="ownedCount">0</b><small>Marcadas</small></div><div class="stat"><b id="totalCount">88</b><small>Entradas de la lista</small></div><div class="stat"><b id="percent">0%</b><small>Completado</small></div></section>
+<div class="toolbar">
+<div class="searchrow"><input class="control" id="search" placeholder="Buscar carta por nombre…" aria-label="Buscar carta"><button class="btn" id="clearSearch" type="button">Limpiar</button></div>
+<div class="tabs"><button class="tab active" data-deck="all" type="button">Ambos arquetipos (88)</button><button class="tab" data-deck="libromancer" type="button">Libromancer (15)</button><button class="tab" data-deck="gladiator" type="button">Bestias Gladiador (73)</button><button class="tab" data-deck="missing" type="button">Pendientes</button></div>
+<div class="filters"><select class="control" id="status"><option value="all">Todas las entradas</option><option value="owned">Marcadas</option><option value="missing">Pendientes</option></select><select class="control" id="sort"><option value="original">Orden original</option><option value="name">Orden alfabético</option></select></div>
+<div class="actions"><button class="btn primary" id="export" type="button">Exportar respaldo</button><button class="btn" id="importBtn" type="button">Importar respaldo</button><button class="btn" id="csv" type="button">Descargar CSV</button><input id="file" type="file" accept="application/json,.json" hidden></div>
+</div>
+<div class="listhead"><span id="shown">Mostrando 88 entradas</span><span>Marca la casilla para llevar tu progreso</span></div><section id="cards" class="cards" aria-live="polite"></section>
+<div class="notice">Las entradas están en inglés para facilitar la búsqueda en catálogos. Se mantienen los nombres y repeticiones de la lista que pediste; verifica los nombres con la <a href="https://www.db.yugioh-card.com/yugiohdb/card_search.action?request_locale=en" target="_blank" rel="noopener">base oficial de cartas de Konami</a>.</div>
+<div class="footer">LIBROMANCER &amp; BESTIAS GLADIADOR · colección personal</div>
+</main><div id="toast" class="footer" role="status"></div></div>
+<script>
+const entries = [{"name": "Libromancer Geek Boy", "deck": "libromancer"}, {"name": "Libromancer Fire", "deck": "libromancer"}, {"name": "Libromancer Magigirl", "deck": "libromancer"}, {"name": "Libromancer Agent", "deck": "libromancer"}, {"name": "Libromancer Firestarter", "deck": "libromancer"}, {"name": "Libromancer Mystigirl", "deck": "libromancer"}, {"name": "Libromancer Doombroker", "deck": "libromancer"}, {"name": "Libromancer Fireburst", "deck": "libromancer"}, {"name": "Libromancer First Appearance", "deck": "libromancer"}, {"name": "Libromancer Bonded", "deck": "libromancer"}, {"name": "Libromancer Realized", "deck": "libromancer"}, {"name": "Libromancer Origin Story", "deck": "libromancer"}, {"name": "Libromancer Displaced", "deck": "libromancer"}, {"name": "Libromancer Intervention", "deck": "libromancer"}, {"name": "Libromancer Prevented", "deck": "libromancer"}, {"name": "Gladiator Beast Alexander", "deck": "gladiator"}, {"name": "Gladiator Beast Andabata", "deck": "gladiator"}, {"name": "Gladiator Beast Andal", "deck": "gladiator"}, {"name": "Gladiator Beast Attorix", "deck": "gladiator"}, {"name": "Gladiator Beast Augustus", "deck": "gladiator"}, {"name": "Gladiator Beast Bestiari", "deck": "gladiator"}, {"name": "Gladiator Beast Charge", "deck": "gladiator"}, {"name": "Gladiator Beast Claudius", "deck": "gladiator"}, {"name": "Gladiator Beast Dareios", "deck": "gladiator"}, {"name": "Gladiator Beast Darius", "deck": "gladiator"}, {"name": "Gladiator Beast Dimacari", "deck": "gladiator"}, {"name": "Gladiator Beast Disarm", "deck": "gladiator"}, {"name": "Gladiator Beast Domitianus", "deck": "gladiator"}, {"name": "Gladiator Beast Dragases", "deck": "gladiator"}, {"name": "Gladiator Beast Equeste", "deck": "gladiator"}, {"name": "Gladiator Beast Essedarii", "deck": "gladiator"}, {"name": "Gladiator Beast Gaiodiaz", "deck": "gladiator"}, {"name": "Gladiator Beast Gistel", "deck": "gladiator"}, {"name": "Gladiator Beast Gyzarus", "deck": "gladiator"}, {"name": "Gladiator Beast Heraklinos", "deck": "gladiator"}, {"name": "Gladiator Beast Hoplomus", "deck": "gladiator"}, {"name": "Gladiator Beast Lanista", "deck": "gladiator"}, {"name": "Gladiator Beast Laquari", "deck": "gladiator"}, {"name": "Gladiator Beast Murmillo", "deck": "gladiator"}, {"name": "Gladiator Beast Nerokius", "deck": "gladiator"}, {"name": "Gladiator Beast Noxious", "deck": "gladiator"}, {"name": "Gladiator Beast Octavius", "deck": "gladiator"}, {"name": "Gladiator Beast Retiari", "deck": "gladiator"}, {"name": "Gladiator Beast Sagittarii", "deck": "gladiator"}, {"name": "Gladiator Beast Samnite", "deck": "gladiator"}, {"name": "Gladiator Beast Secutor", "deck": "gladiator"}, {"name": "Gladiator Beast Spartacus", "deck": "gladiator"}, {"name": "Gladiator Beast Tamer Editor", "deck": "gladiator"}, {"name": "Gladiator Beast Torax", "deck": "gladiator"}, {"name": "Gladiator Beast Tygerius", "deck": "gladiator"}, {"name": "Gladiator Beast Vespasius", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Archfiend Shield", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Gladius", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Halberd", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Manica", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Steed", "deck": "gladiator"}, {"name": "Gladiator Beast Comeback", "deck": "gladiator"}, {"name": "Gladiator Beast Respite", "deck": "gladiator"}, {"name": "Gladiator Beast Return", "deck": "gladiator"}, {"name": "Gladiator Beast United", "deck": "gladiator"}, {"name": "Gladiator Beast War Chariot", "deck": "gladiator"}, {"name": "Gladiator Beast Assault Fort", "deck": "gladiator"}, {"name": "Gladiator Beast Great Fortress", "deck": "gladiator"}, {"name": "Gladiator Beast Medallion", "deck": "gladiator"}, {"name": "Gladiator Beast Medusa Shield", "deck": "gladiator"}, {"name": "Gladiator Beast Valor", "deck": "gladiator"}, {"name": "Gladiator Beast Fort", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Line", "deck": "gladiator"}, {"name": "Gladiator Beast Charge", "deck": "gladiator"}, {"name": "Gladiator Beast Double Tag Team", "deck": "gladiator"}, {"name": "Gladiator Beast Defensive Tactics", "deck": "gladiator"}, {"name": "Gladiator Beast Respite", "deck": "gladiator"}, {"name": "Gladiator Beast Return", "deck": "gladiator"}, {"name": "Gladiator Beast Rejection", "deck": "gladiator"}, {"name": "Gladiator Beast Proving Ground", "deck": "gladiator"}, {"name": "Gladiator Beast Comeback", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Archfiend Shield", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Gladius", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Halberd", "deck": "gladiator"}, {"name": "Gladiator Beast Battle Manica", "deck": "gladiator"}, {"name": "Colosseum - Cage of the Gladiator Beasts", "deck": "gladiator"}, {"name": "Flavian - Colosseum of the Gladiator Beasts", "deck": "gladiator"}, {"name": "Gladiator Naumachia", "deck": "gladiator"}, {"name": "Gladiator Lash", "deck": "gladiator"}, {"name": "Gladiator Taming", "deck": "gladiator"}, {"name": "Gladiator's Return", "deck": "gladiator"}, {"name": "Trojan Gladiator Beast", "deck": "gladiator"}, {"name": "Test Panther", "deck": "gladiator"}];
+const KEY='libromancerGladiatorChecklist_v1';
+let owned=new Set();
+try{owned=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'))}catch(e){}
+let deck='all';
+const $=id=>document.getElementById(id);
+function toast(message){$('toast').textContent=message}
+function save(){try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){toast('No se pudo guardar; exporta un respaldo.')}}
+function render(){
+  const query=$('search').value.trim().toLowerCase();
+  let shown=entries.filter((entry,index)=>{
+    const id='entry-'+index;
+    const status=$('status').value;
+    const matchesDeck=deck==='all'||(deck==='missing'?!owned.has(id):entry.deck===deck);
+    const matchesStatus=status==='all'||(status==='owned'?owned.has(id):!owned.has(id));
+    return matchesDeck&&matchesStatus&&entry.name.toLowerCase().includes(query);
+  }).map((entry,index)=>({entry, id:'entry-'+entries.indexOf(entry), original:entries.indexOf(entry)}));
+  if($('sort').value==='name')shown.sort((a,b)=>a.entry.name.localeCompare(b.entry.name,'en')||a.original-b.original);
+  $('ownedCount').textContent=owned.size;
+  $('totalCount').textContent=entries.length;
+  $('percent').textContent=Math.round(owned.size/entries.length*100)+'%';
+  $('shown').textContent=`Mostrando ${shown.length} de ${entries.length} entradas`;
+  const root=$('cards');root.innerHTML='';
+  if(!shown.length){root.innerHTML='<div class="empty">No hay entradas que coincidan con tu búsqueda.</div>';return}
+  const frag=document.createDocumentFragment();
+  for(const item of shown){
+    const card=document.createElement('label');card.className='card'+(owned.has(item.id)?' owned':'');
+    const check=document.createElement('input');check.type='checkbox';check.className='check';check.checked=owned.has(item.id);check.setAttribute('aria-label','Tengo '+item.entry.name);
+    check.addEventListener('change',()=>{if(check.checked)owned.add(item.id);else owned.delete(item.id);save();render()});
+    const details=document.createElement('div');const name=document.createElement('div');name.className='name';name.textContent=item.entry.name;
+    const sub=document.createElement('div');sub.className='sub';sub.textContent=item.entry.deck==='libromancer'?'Libromancer':'Bestias Gladiador';
+    details.append(name,sub);const tag=document.createElement('span');tag.className='tag';tag.textContent=owned.has(item.id)?'MARCADA':sub.textContent;
+    card.append(check,details,tag);frag.appendChild(card)
+  }
+  root.appendChild(frag)
+}
+document.querySelectorAll('[data-deck]').forEach(button=>button.addEventListener('click',()=>{
+  deck=button.dataset.deck;document.querySelectorAll('[data-deck]').forEach(b=>b.classList.toggle('active',b===button));render()
+}));
+['search','status','sort'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+$('clearSearch').onclick=()=>{$('search').value='';render()};
+$('export').onclick=()=>{const data={app:'Libromancer & Bestias Gladiador Checklist',version:1,exportedAt:new Date().toISOString(),owned:[...owned]};download('libromancer-bestias-respaldo.json',JSON.stringify(data,null,2),'application/json');toast('Respaldo exportado')};
+$('importBtn').onclick=()=> $('file').click();
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());owned=new Set(Array.isArray(data.owned)?data.owned.filter(id=>entries.some((_,i)=>'entry-'+i===id)):[]);save();render();toast('Respaldo importado')}catch(err){toast('No se pudo leer ese respaldo')}e.target.value=''};
+$('csv').onclick=()=>{const rows=[['Arquetipo','Carta','Marcada'],...entries.map((entry,i)=>[entry.deck==='libromancer'?'Libromancer':'Bestias Gladiador',entry.name,owned.has('entry-'+i)?'Sí':'No'])];const csv=rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');download('libromancer-bestias-checklist.csv','\ufeff'+csv,'text/csv;charset=utf-8');toast('CSV descargado')};
+function download(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+render();
+</script></body></html>
